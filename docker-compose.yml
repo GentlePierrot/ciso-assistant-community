@@ -4,8 +4,8 @@ services:
     image: ghcr.io/intuitem/ciso-assistant-community/backend:latest
     restart: always
     environment:
-      - ALLOWED_HOSTS=backend,localhost
-      - CISO_ASSISTANT_URL=https://localhost:8443
+      - ALLOWED_HOSTS=backend,ciso-assistant.eastasia.cloudapp.azure.com
+      - CISO_ASSISTANT_URL=https://ciso-assistant.eastasia.cloudapp.azure.com:8443
       - DJANGO_DEBUG=True
       - AUTH_TOKEN_TTL=7200
     volumes:
@@ -15,7 +15,7 @@ services:
     container_name: frontend
     environment:
       - PUBLIC_BACKEND_API_URL=http://backend:8000/api
-      - PUBLIC_BACKEND_API_EXPOSED_URL=https://localhost:8443/api
+      - PUBLIC_BACKEND_API_EXPOSED_URL=https://ciso-assistant.eastasia.cloudapp.azure.com:8443/api
       - PROTOCOL_HEADER=x-forwarded-proto
       - HOST_HEADER=x-forwarded-host
 
@@ -27,7 +27,7 @@ services:
     container_name: caddy
     image: caddy:2.8.4
     environment:
-      - CISO_ASSISTANT_URL=https://localhost:8443
+      - CISO_ASSISTANT_URL=https://ciso-assistant.eastasia.cloudapp.azure.com:8443
     depends_on:
       - frontend
     restart: unless-stopped
@@ -39,4 +39,5 @@ services:
       sh -c 'echo $$CISO_ASSISTANT_URL "{
       reverse_proxy /api/* backend:8000
       reverse_proxy /* frontend:3000
+      tls internal
       }" > Caddyfile && caddy run'
